@@ -1,4 +1,4 @@
-import datetime as dt
+from datetime import datetime, timezone
 
 import pytest
 
@@ -17,9 +17,9 @@ def config():
 
 @pytest.fixture
 def rate_timestamp():
-    return dt.datetime(2026, 6, 2, 23, 59, 59, tzinfo=dt.timezone.utc)
+    return datetime(2026, 6, 2, 23, 59, 59, tzinfo=timezone.utc)
 
 
 @pytest.fixture
 def fetched_at():
-    return dt.datetime(2026, 6, 3, 12, 0, 0, tzinfo=dt.timezone.utc)
+    return datetime(2026, 6, 3, 12, 0, 0, tzinfo=timezone.utc)

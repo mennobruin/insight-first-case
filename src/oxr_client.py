@@ -1,4 +1,4 @@
-import datetime as dt
+from datetime import date, datetime, timezone
 from decimal import Decimal
 
 import requests
@@ -18,9 +18,9 @@ class OxrSnapshot(BaseModel):
 
     model_config = ConfigDict(frozen=True)
 
-    date: dt.date
+    date: date
     rates: dict[str, Decimal]
-    timestamp: dt.datetime  # OXR `timestamp` (epoch seconds) → UTC
+    timestamp: datetime  # OXR `timestamp` (epoch seconds) → UTC
 
 
 class OxrClient:
@@ -41,9 +41,9 @@ class OxrClient:
 
         self._symbols = ",".join(dict.fromkeys(("EUR", *TARGET_CURRENCIES)))
 
-    def fetch_historical(self, date: dt.date) -> OxrSnapshot:
+    def fetch_historical(self, rate_date: date) -> OxrSnapshot:
         """Return the USD-base rates and source timestamp for a single date."""
-        url = f"{self.config.base_url}/historical/{date.isoformat()}.json"
+        url = f"{self.config.base_url}/historical/{rate_date.isoformat()}.json"
         try:
             resp = self.session.get(
                 url,
@@ -52,15 +52,15 @@ class OxrClient:
             )
             resp.raise_for_status()
         except requests.RequestException as exc:
-            raise OxrError(f"OXR request failed for {date}: {exc}") from exc
+            raise OxrError(f"OXR request failed for {rate_date}: {exc}") from exc
 
         body = resp.json(parse_float=Decimal)
         rates = body.get("rates")
         if not isinstance(rates, dict) or not rates:
-            raise OxrError(f"OXR response for {date} missing 'rates': {body!r}")
+            raise OxrError(f"OXR response for {rate_date} missing 'rates': {body!r}")
         epoch = body.get("timestamp")
         if not isinstance(epoch, (int, float)):
-            raise OxrError(f"OXR response for {date} missing 'timestamp': {body!r}")
-        timestamp = dt.datetime.fromtimestamp(epoch, tz=dt.timezone.utc)
-        return OxrSnapshot(date=date, rates=rates, timestamp=timestamp)
+            raise OxrError(f"OXR response for {rate_date} missing 'timestamp': {body!r}")
+        timestamp = datetime.fromtimestamp(epoch, tz=timezone.utc)
+        return OxrSnapshot(date=rate_date, rates=rates, timestamp=timestamp)
 

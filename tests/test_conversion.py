@@ -1,12 +1,12 @@
 """The core correctness: USD-base → EUR-per-unit, and the EUR-missing guard."""
-import datetime as dt
+from datetime import date
 from decimal import Decimal
 
 import pytest
 
 from conversion import MissingCurrencyError, to_eur_rates
 
-DATE = dt.date(2026, 6, 2)
+DATE = date(2026, 6, 2)
 # OXR free, USD base: value of 1 USD in each currency (+ an extra we should ignore).
 USD_BASE = {
     "EUR": Decimal("0.873117"),

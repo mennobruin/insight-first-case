@@ -1,15 +1,15 @@
 """The idempotency contract (MERGE) and the create→merge write path."""
-import datetime as dt
+from datetime import date, datetime, timezone
 from decimal import Decimal
 
 from bigquery_writer import BigQueryWriter
 from models import RateRow
 
-TS = dt.datetime(2026, 6, 2, 23, 59, 59, tzinfo=dt.timezone.utc)
-NOW = dt.datetime(2026, 6, 3, tzinfo=dt.timezone.utc)
+TS = datetime(2026, 6, 2, 23, 59, 59, tzinfo=timezone.utc)
+NOW = datetime(2026, 6, 3, tzinfo=timezone.utc)
 ROWS = [
-    RateRow(date=dt.date(2026, 6, 2), currency="USD", rate=Decimal("0.873"), rate_timestamp=TS, fetched_at=NOW),
-    RateRow(date=dt.date(2026, 6, 2), currency="GBP", rate=Decimal("1.183"), rate_timestamp=TS, fetched_at=NOW),
+    RateRow(date=date(2026, 6, 2), currency="USD", rate=Decimal("0.873"), rate_timestamp=TS, fetched_at=NOW),
+    RateRow(date=date(2026, 6, 2), currency="GBP", rate=Decimal("1.183"), rate_timestamp=TS, fetched_at=NOW),
 ]
 
 

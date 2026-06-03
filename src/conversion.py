@@ -1,5 +1,5 @@
 """Convert OXR USD-base rates into EUR-base rows (EUR per 1 unit of currency)."""
-import datetime as dt
+from datetime import date, datetime
 from decimal import Decimal
 
 from config import TARGET_CURRENCIES
@@ -12,9 +12,9 @@ class MissingCurrencyError(ValueError):
 
 def to_eur_rates(
     usd_base_rates: dict[str, Decimal],
-    date: dt.date,
-    rate_timestamp: dt.datetime,
-    fetched_at: dt.datetime,
+    rate_date: date,
+    rate_timestamp: datetime,
+    fetched_at: datetime,
     targets: tuple[str, ...] = TARGET_CURRENCIES,
 ) -> list[RateRow]:
     """Convert USD-base quotes to EUR-base rows.
@@ -35,7 +35,7 @@ def to_eur_rates(
             raise MissingCurrencyError(f"{ccy} rate missing or zero in OXR response")
         rows.append(
             RateRow(
-                date=date,
+                date=rate_date,
                 currency=ccy,
                 rate=eur_per_usd / ccy_per_usd,
                 rate_timestamp=rate_timestamp,
