@@ -30,8 +30,6 @@ class OxrClient:
         self.timeout = timeout
         self.session = requests.Session()
 
-        self.session.headers["Authorization"] = f"Token {config.app_id}"
-
         retry = Retry(
             total=3,
             backoff_factor=0.5,
@@ -48,7 +46,9 @@ class OxrClient:
         url = f"{self.config.base_url}/historical/{date.isoformat()}.json"
         try:
             resp = self.session.get(
-                url, params={"symbols": self._symbols}, timeout=self.timeout
+                url,
+                params={"app_id": self.config.app_id, "symbols": self._symbols},
+                timeout=self.timeout,
             )
             resp.raise_for_status()
         except requests.RequestException as exc:

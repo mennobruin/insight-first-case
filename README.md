@@ -7,7 +7,7 @@ base**, and upserts one clean analytical table in BigQuery. Designed to run as a
 
 ## What it does
 
-1. For each of the last 30 days, call `GET /historical/{date}.json` (USD base) with `symbols=EUR,USD,GBP,JPY,CHF`.
+1. For each of the last 30 days, call `GET /historical/{date}.json` (USD base) and filter on `EUR,USD,GBP,JPY,CHF`.
 2. Convert each currency to **EUR per 1 unit of currency**:
    `rate = rates["EUR"] / rates[currency]`. If `EUR` (or a target
    currency) is missing/zero, that day is skipped.
@@ -56,7 +56,7 @@ VALUES (S.date, S.currency, S.rate, S.rate_timestamp, S.fetched_at);
 
 | var | required | default | notes |
 |---|---|---|---|
-| `OXR_APP_ID` | ✅ | — | Open Exchange Rates app id (sent as an `Authorization` header). |
+| `OXR_APP_ID` | ✅ | — | Open Exchange Rates app id (sent as the `app_id` query parameter). |
 | `GCP_PROJECT` | ✅ | — | Target GCP project. |
 | `BQ_DATASET` | | `finance` | |
 | `BQ_TABLE` | | `exchange_rates` | |
