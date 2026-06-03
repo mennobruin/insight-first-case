@@ -4,7 +4,7 @@ from decimal import Decimal
 from pydantic import BaseModel, ConfigDict
 
 
-class RateRow(BaseModel):
+class ExchangeRate(BaseModel):
 
     model_config = ConfigDict(frozen=True)
 

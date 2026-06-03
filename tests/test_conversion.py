@@ -18,14 +18,14 @@ USD_BASE = {
 
 
 def test_converts_each_target_to_eur_per_unit(rate_timestamp, fetched_at):
-    rows = {r.currency: r for r in to_eur_rates(USD_BASE, DATE, rate_timestamp, fetched_at)}
+    rates = {r.currency: r for r in to_eur_rates(USD_BASE, DATE, rate_timestamp, fetched_at)}
     # EUR per 1 unit X = rates[EUR] / rates[X], computed exactly in Decimal.
-    assert rows.keys() == {"USD", "GBP", "JPY", "CHF"}
-    assert rows["USD"].rate == Decimal("0.873117") / Decimal("1.0")
-    assert rows["GBP"].rate == Decimal("0.873117") / Decimal("0.737614")
-    assert rows["JPY"].rate == Decimal("0.873117") / Decimal("142.42825")
-    assert rows["CHF"].rate == Decimal("0.873117") / Decimal("0.815974")
-    assert rows["USD"].rate_timestamp == rate_timestamp
+    assert rates.keys() == {"USD", "GBP", "JPY", "CHF"}
+    assert rates["USD"].rate == Decimal("0.873117") / Decimal("1.0")
+    assert rates["GBP"].rate == Decimal("0.873117") / Decimal("0.737614")
+    assert rates["JPY"].rate == Decimal("0.873117") / Decimal("142.42825")
+    assert rates["CHF"].rate == Decimal("0.873117") / Decimal("0.815974")
+    assert rates["USD"].rate_timestamp == rate_timestamp
 
 
 def test_raises_when_eur_missing(rate_timestamp, fetched_at):

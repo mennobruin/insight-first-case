@@ -7,7 +7,7 @@ import sys
 from bigquery_writer import BigQueryWriter
 from config import DAYS_TO_FETCH, Config
 from conversion import MissingCurrencyError, to_eur_rates
-from models import RateRow
+from models import ExchangeRate
 from oxr_client import OxrClient, OxrError
 
 
@@ -30,14 +30,14 @@ def run(config: Config) -> int:
     fetched_at = datetime.now(tz=timezone.utc)
     today = fetched_at.date()
 
-    rows: list[RateRow] = []
+    rates: list[ExchangeRate] = []
     fetch_failures = 0
     data_failures = 0
-    
+
     for rate_date in last_n_days(n=DAYS_TO_FETCH, today=today):
         try:
             snapshot = client.fetch_historical(rate_date)
-            rows.extend(
+            rates.extend(
                 to_eur_rates(snapshot.rates, rate_date, snapshot.timestamp, fetched_at)
             )
         except OxrError:
@@ -49,7 +49,7 @@ def run(config: Config) -> int:
             data_failures += 1
             logger.warning(f"Skipping {rate_date} due to data error", exc_info=True)
 
-    if not rows:
+    if not rates:
         logger.error(
             f"No rates collected across {DAYS_TO_FETCH} day(s) "
             f"({fetch_failures} fetch / {data_failures} data failures); "
@@ -57,7 +57,7 @@ def run(config: Config) -> int:
         )
         return 1
 
-    written = writer.upsert(rows)
+    written = writer.upsert(rates)
     logger.info(
         f"Run complete: {written} rows upserted; "
         f"{fetch_failures} fetch / {data_failures} data day(s) failed"

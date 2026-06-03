@@ -3,7 +3,7 @@ import logging
 from google.cloud import bigquery
 
 from config import Config
-from models import RateRow
+from models import ExchangeRate
 
 logger = logging.getLogger(__name__)
 
@@ -27,7 +27,7 @@ class BigQueryWriter:
         insert_vals = ", ".join(f"S.{name}" for name, _ in _COLUMNS)
         return (
             f"MERGE `{self.config.table_path}` T\n"
-            "USING (SELECT * FROM UNNEST(@rows)) S\n"
+            "USING (SELECT * FROM UNNEST(@rates)) S\n"
             "ON T.date = S.date AND T.currency = S.currency\n"
             "WHEN MATCHED AND T.rate != S.rate THEN UPDATE SET\n"
             "  rate = S.rate, rate_timestamp = S.rate_timestamp, fetched_at = S.fetched_at\n"
@@ -35,28 +35,28 @@ class BigQueryWriter:
             f"VALUES ({insert_vals});"
         )
 
-    def upsert(self, rows: list[RateRow]) -> int:
-        if not rows:
+    def upsert(self, rates: list[ExchangeRate]) -> int:
+        if not rates:
             logger.info("No rows to upsert; skipping.")
             return 0
 
-        rows_param = bigquery.ArrayQueryParameter(
-            "rows", "STRUCT", [self._row_param(r) for r in rows]
+        rates_param = bigquery.ArrayQueryParameter(
+            "rates", "STRUCT", [self._convert_to_query_param(rate) for rate in rates]
         )
-        job_config = bigquery.QueryJobConfig(query_parameters=[rows_param])
+        job_config = bigquery.QueryJobConfig(query_parameters=[rates_param])
         self.client.query(self.merge_sql(), job_config=job_config).result()
 
-        logger.info(f"Upserted {len(rows)} rows into `{self.config.table_path}`")
-        return len(rows)
+        logger.info(f"Upserted {len(rates)} rows into `{self.config.table_path}`")
+        return len(rates)
 
     @staticmethod
-    def _row_param(row: RateRow) -> bigquery.StructQueryParameter:
+    def _convert_to_query_param(rate: ExchangeRate) -> bigquery.StructQueryParameter:
         values = {
-            "date": row.date,
-            "currency": row.currency,
-            "rate": row.rate,
-            "rate_timestamp": row.rate_timestamp,
-            "fetched_at": row.fetched_at,
+            "date": rate.date,
+            "currency": rate.currency,
+            "rate": rate.rate,
+            "rate_timestamp": rate.rate_timestamp,
+            "fetched_at": rate.fetched_at,
         }
         return bigquery.StructQueryParameter(
             None,
