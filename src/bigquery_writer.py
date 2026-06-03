@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 _COLUMNS = (
     ("date", "DATE"),
     ("currency", "STRING"),
-    ("rate", "NUMERIC"),
+    ("rate", "BIGNUMERIC"),
     ("rate_timestamp", "TIMESTAMP"),
     ("fetched_at", "TIMESTAMP"),
 )

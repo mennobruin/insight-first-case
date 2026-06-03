@@ -29,7 +29,7 @@ We work under the assumption that an `exchange_rates` table already exists in Bi
 |---|---|---|
 | `date` | `DATE` | The date the rate applies to. |
 | `currency` | `STRING` | `USD`, `GBP`, `JPY`, `CHF`. |
-| `rate` | `NUMERIC` | EUR per 1 unit of `currency`. |
+| `rate` | `BIGNUMERIC` | EUR per 1 unit of `currency`. |
 | `rate_timestamp` | `TIMESTAMP` | When the **source** published the rate (OXR `timestamp`). |
 | `fetched_at` | `TIMESTAMP` | When **we** fetched/wrote the row. |
 

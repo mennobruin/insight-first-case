@@ -10,6 +10,6 @@ class RateRow(BaseModel):
 
     date: date
     currency: str
-    rate: Decimal  # EUR per 1 unit of `currency` (BigQuery NUMERIC)
+    rate: Decimal  # EUR per 1 unit of `currency` (BigQuery BIGNUMERIC)
     rate_timestamp: datetime  # when the OXR source published the rate
     fetched_at: datetime  # when we fetched/wrote the row

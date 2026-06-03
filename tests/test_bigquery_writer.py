@@ -23,7 +23,7 @@ def test_merge_matches_on_key_and_updates_only_on_change(config, mocker):
     assert "WHEN NOT MATCHED THEN INSERT" in sql
 
 
-def test_upsert_creates_table_then_merges_rows_inline(config, mocker):
+def test_upsert_merges_rows_inline(config, mocker):
     client = mocker.Mock()
     writer = BigQueryWriter(config, client=client)
 
