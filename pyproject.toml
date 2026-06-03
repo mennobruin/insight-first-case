@@ -1,0 +1,30 @@
+[project]
+name = "insight-first-case"
+version = "0.1.0"
+description = "Daily Open Exchange Rates → BigQuery (EUR base) job"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "requests>=2.32",
+    "google-cloud-bigquery>=3.25",
+    "pydantic>=2.6",
+    "pydantic-settings>=2.2",
+]
+
+[dependency-groups]
+dev = ["pytest>=8.3", "pytest-mock>=3.14"]
+
+[project.scripts]
+fetch-rates = "main:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+sources = ["src"]
+only-include = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
