@@ -1,4 +1,4 @@
-"""Config validation: required env vars and a sane day window."""
+"""Config validation: required env vars and default flow-through."""
 import pytest
 from pydantic import ValidationError
 

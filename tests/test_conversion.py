@@ -26,6 +26,7 @@ def test_converts_each_target_to_eur_per_unit(rate_timestamp, fetched_at):
     assert rates["JPY"].rate == USD_BASE["EUR"] / USD_BASE["JPY"]
     assert rates["CHF"].rate == USD_BASE["EUR"] / USD_BASE["CHF"]
     assert rates["USD"].rate_timestamp == rate_timestamp
+    assert rates["USD"].fetched_at == fetched_at
 
 
 def test_raises_when_eur_missing(rate_timestamp, fetched_at):
