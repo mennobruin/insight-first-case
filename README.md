@@ -35,11 +35,11 @@ We work under the assumption that an `exchange_rates` table already exists in Bi
 
 ### Idempotency (no duplicates, updates on correction)
 
-The rows for the window are passed inline to a single parameterized `MERGE`:
+The rates for the window are passed inline to a single parameterized `MERGE`:
 
 ```sql
 MERGE `<project>.<dataset>.exchange_rates` T
-USING (SELECT * FROM UNNEST(@rows)) S
+USING (SELECT * FROM UNNEST(@rates)) S
 ON T.date = S.date AND T.currency = S.currency
 WHEN MATCHED AND T.rate != S.rate THEN UPDATE SET
   rate = S.rate, rate_timestamp = S.rate_timestamp, fetched_at = S.fetched_at
