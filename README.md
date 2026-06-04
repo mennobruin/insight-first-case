@@ -30,7 +30,7 @@ We work under the assumption that an `exchange_rates` table already exists in Bi
 | `date` | `DATE` | The date the rate applies to. |
 | `currency` | `STRING` | `USD`, `GBP`, `JPY`, `CHF`. |
 | `rate` | `BIGNUMERIC` | EUR per 1 unit of `currency`. |
-| `rate_timestamp` | `TIMESTAMP` | When the **source** published the rate (OXR `timestamp`). |
+| `published_at` | `TIMESTAMP` | When the **source** published the rate (OXR `timestamp`). |
 | `fetched_at` | `TIMESTAMP` | When **we** fetched/wrote the row. |
 
 ### Idempotency (no duplicates, updates on correction)
@@ -42,9 +42,9 @@ MERGE `<project>.<dataset>.exchange_rates` T
 USING (SELECT * FROM UNNEST(@rates)) S
 ON T.date = S.date AND T.currency = S.currency
 WHEN MATCHED AND T.rate != S.rate THEN UPDATE SET
-  rate = S.rate, rate_timestamp = S.rate_timestamp, fetched_at = S.fetched_at
-WHEN NOT MATCHED THEN INSERT (date, currency, rate, rate_timestamp, fetched_at)
-VALUES (S.date, S.currency, S.rate, S.rate_timestamp, S.fetched_at);
+  rate = S.rate, published_at = S.published_at, fetched_at = S.fetched_at
+WHEN NOT MATCHED THEN INSERT (date, currency, rate, published_at, fetched_at)
+VALUES (S.date, S.currency, S.rate, S.published_at, S.fetched_at);
 ```
 
 - **No duplicates on re-run** — the key match means a re-run updates in place.

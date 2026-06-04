@@ -12,7 +12,7 @@ _COLUMNS = (
     ("date", "DATE"),
     ("currency", "STRING"),
     ("rate", "BIGNUMERIC"),
-    ("rate_timestamp", "TIMESTAMP"),
+    ("published_at", "TIMESTAMP"),
     ("fetched_at", "TIMESTAMP"),
 )
 
@@ -31,7 +31,7 @@ class BigQueryWriter:
             "USING (SELECT * FROM UNNEST(@rates)) S\n"
             "ON T.date = S.date AND T.currency = S.currency\n"
             "WHEN MATCHED AND T.rate != S.rate THEN UPDATE SET\n"
-            "  rate = S.rate, rate_timestamp = S.rate_timestamp, fetched_at = S.fetched_at\n"
+            "  rate = S.rate, published_at = S.published_at, fetched_at = S.fetched_at\n"
             f"WHEN NOT MATCHED THEN INSERT ({cols})\n"
             f"VALUES ({insert_vals});"
         )
@@ -56,7 +56,7 @@ class BigQueryWriter:
             "date": rate.date,
             "currency": rate.currency,
             "rate": rate.rate,
-            "rate_timestamp": rate.rate_timestamp,
+            "published_at": rate.published_at,
             "fetched_at": rate.fetched_at,
         }
         return bigquery.StructQueryParameter(

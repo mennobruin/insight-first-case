@@ -13,7 +13,7 @@ class MissingCurrencyError(ValueError):
 def to_eur_rates(
     usd_base_rates: dict[str, Decimal],
     rate_date: date,
-    rate_timestamp: datetime,
+    published_at: datetime,
     fetched_at: datetime,
     targets: tuple[str, ...] = TARGET_CURRENCIES,
 ) -> list[ExchangeRate]:
@@ -38,7 +38,7 @@ def to_eur_rates(
                 date=rate_date,
                 currency=currency,
                 rate=eur_per_usd / currency_per_usd,
-                rate_timestamp=rate_timestamp,
+                published_at=published_at,
                 fetched_at=fetched_at,
             )
         )

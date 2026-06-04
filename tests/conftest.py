@@ -16,7 +16,7 @@ def config():
 
 
 @pytest.fixture
-def rate_timestamp():
+def published_at():
     return datetime(2026, 6, 2, 23, 59, 59, tzinfo=timezone.utc)
 
 

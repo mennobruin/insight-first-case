@@ -8,8 +8,8 @@ from models import ExchangeRate
 TS = datetime(2026, 6, 2, 23, 59, 59, tzinfo=timezone.utc)
 NOW = datetime(2026, 6, 3, tzinfo=timezone.utc)
 RATES = [
-    ExchangeRate(date=date(2026, 6, 2), currency="USD", rate=Decimal("0.873"), rate_timestamp=TS, fetched_at=NOW),
-    ExchangeRate(date=date(2026, 6, 2), currency="GBP", rate=Decimal("1.183"), rate_timestamp=TS, fetched_at=NOW),
+    ExchangeRate(date=date(2026, 6, 2), currency="USD", rate=Decimal("0.873"), published_at=TS, fetched_at=NOW),
+    ExchangeRate(date=date(2026, 6, 2), currency="GBP", rate=Decimal("1.183"), published_at=TS, fetched_at=NOW),
 ]
 
 
