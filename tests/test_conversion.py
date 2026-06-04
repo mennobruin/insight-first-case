@@ -19,12 +19,12 @@ USD_BASE = {
 
 def test_converts_each_target_to_eur_per_unit(rate_timestamp, fetched_at):
     rates = {r.currency: r for r in to_eur_rates(USD_BASE, DATE, rate_timestamp, fetched_at)}
-    # EUR per 1 unit X = rates[EUR] / rates[X], computed exactly in Decimal.
+    
     assert rates.keys() == {"USD", "GBP", "JPY", "CHF"}
-    assert rates["USD"].rate == Decimal("0.873117") / Decimal("1.0")
-    assert rates["GBP"].rate == Decimal("0.873117") / Decimal("0.737614")
-    assert rates["JPY"].rate == Decimal("0.873117") / Decimal("142.42825")
-    assert rates["CHF"].rate == Decimal("0.873117") / Decimal("0.815974")
+    assert rates["USD"].rate == USD_BASE["EUR"] / USD_BASE["USD"]
+    assert rates["GBP"].rate == USD_BASE["EUR"] / USD_BASE["GBP"]
+    assert rates["JPY"].rate == USD_BASE["EUR"] / USD_BASE["JPY"]
+    assert rates["CHF"].rate == USD_BASE["EUR"] / USD_BASE["CHF"]
     assert rates["USD"].rate_timestamp == rate_timestamp
 
 

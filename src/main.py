@@ -24,7 +24,14 @@ def last_n_days(n: int, today: date):
 
 
 def run(config: Config) -> int:
-    """Execute the job. Returns a process exit code (0 = success)."""
+    """ 
+    Execute a data pulling job, fetching the last 30 days of exchange rate data from the OpenExchangeRates (OXR) API.
+    The data returned from OXR is in a USD base, which is then converted to EUR before being uploaded to BigQuery.
+     
+    Returns: a process exit code
+       - 0 = success
+       - 1 = failure, no rates were collected for the last 30 days
+    """
     client = OxrClient(config)
     writer = BigQueryWriter(config)
     fetched_at = datetime.now(tz=timezone.utc)
@@ -34,20 +41,26 @@ def run(config: Config) -> int:
     fetch_failures = 0
     data_failures = 0
 
-    for rate_date in last_n_days(n=DAYS_TO_FETCH, today=today):
+    # since the historical OXR API requires a date specified, we loop through the last DAYS_TO_FETCH days and pull data for each.
+    for day_to_fetch in last_n_days(n=DAYS_TO_FETCH, today=today):
         try:
-            snapshot = client.fetch_historical(rate_date)
+            historical_rates = client.fetch_historical(day_to_fetch)
             rates.extend(
-                to_eur_rates(snapshot.rates, rate_date, snapshot.timestamp, fetched_at)
+                to_eur_rates(
+                    historical_rates.rates, 
+                    day_to_fetch, 
+                    historical_rates.timestamp, 
+                    fetched_at
+                )
             )
         except OxrError:
             # Transient/per-day fetch problem: skip this date, keep the rest.
             fetch_failures += 1
-            logger.warning(f"Skipping {rate_date} due to fetch error", exc_info=True)
+            logger.warning(f"Skipping {day_to_fetch} due to fetch error", exc_info=True)
         except MissingCurrencyError:
             # This date's payload is unusable; skip it rather than the whole run.
             data_failures += 1
-            logger.warning(f"Skipping {rate_date} due to data error", exc_info=True)
+            logger.warning(f"Skipping {day_to_fetch} due to data error", exc_info=True)
 
     if not rates:
         logger.error(
@@ -75,7 +88,8 @@ def check_env() -> None:
 def main() -> None:
     check_env()
     try:
-        sys.exit(run(Config()))
+        config = Config()
+        sys.exit(run(config))
     except Exception:
         logger.exception("Unhandled error; job failed", exc_info=True)
         sys.exit(3)

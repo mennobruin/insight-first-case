@@ -17,5 +17,5 @@ class Config(BaseSettings):
     bq_table: str = Field(default="exchange_rates", alias="BQ_TABLE")
 
     @property
-    def table_path(self) -> str:
+    def table_path(self) -> str:  # for this example we assume a table exists named <gcp_project>.finance.exchange_rates
         return f"{self.gcp_project}.{self.bq_dataset}.{self.bq_table}"

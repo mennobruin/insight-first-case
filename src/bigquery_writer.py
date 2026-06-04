@@ -18,6 +18,7 @@ _COLUMNS = (
 
 
 class BigQueryWriter:
+    
     def __init__(self, config: Config, client: bigquery.Client | None = None):
         self.config = config
         self.client = client or bigquery.Client(project=config.gcp_project)

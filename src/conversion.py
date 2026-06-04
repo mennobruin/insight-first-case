@@ -19,25 +19,25 @@ def to_eur_rates(
 ) -> list[ExchangeRate]:
     """Convert USD-base quotes to EUR-base rows.
 
-    OXR free returns ``rates[X]`` = units of X per 1 USD. The value of 1 unit of
-    currency X in EUR is therefore ``rates["EUR"] / rates[X]`` (USD cancels).
+    OXR returns ``rates[X]`` = units of X per 1 USD. 
+    The value of 1 unit of currency X in EUR is therefore ``rates["EUR"] / rates[X]``.
     """
     eur_per_usd = usd_base_rates.get("EUR")
-    if not eur_per_usd:  # missing or zero → cannot establish EUR base
+    if not eur_per_usd:  # missing or zero -> cannot establish EUR base
         raise MissingCurrencyError(
             "EUR rate missing or zero in OXR response; cannot convert to EUR base"
         )
 
     rates: list[ExchangeRate] = []
-    for ccy in targets:
-        ccy_per_usd = usd_base_rates.get(ccy)
-        if not ccy_per_usd:
-            raise MissingCurrencyError(f"{ccy} rate missing or zero in OXR response")
+    for currency in targets:
+        currency_per_usd = usd_base_rates.get(currency)
+        if not currency_per_usd:
+            raise MissingCurrencyError(f"{currency} rate missing or zero in OXR response")
         rates.append(
             ExchangeRate(
                 date=rate_date,
-                currency=ccy,
-                rate=eur_per_usd / ccy_per_usd,
+                currency=currency,
+                rate=eur_per_usd / currency_per_usd,
                 rate_timestamp=rate_timestamp,
                 fetched_at=fetched_at,
             )

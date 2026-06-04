@@ -16,6 +16,7 @@ RATES = [
 def test_merge_matches_on_key_and_updates_only_on_change(config, mocker):
     """No duplicate rows on re-run; existing values updated only when the rate changes."""
     sql = BigQueryWriter(config, client=mocker.Mock()).merge_sql()
+    
     assert "MERGE `proj.ds.exchange_rates`" in sql
     assert "ON T.date = S.date AND T.currency = S.currency" in sql
     assert "WHEN MATCHED AND T.rate != S.rate THEN UPDATE SET" in sql
@@ -38,7 +39,8 @@ def test_upsert_merges_rates_inline(config, mocker):
     assert len(params[0].values) == 2  # one struct per row, passed safely as a param
 
 
-def test_upsert_empty_is_noop(config, mocker):
+def test_upsert_empty(config, mocker):
     client = mocker.Mock()
+    
     assert BigQueryWriter(config, client=client).upsert([]) == 0
     client.query.assert_not_called()

@@ -33,16 +33,19 @@ class OxrClient:
         retry = Retry(
             total=3,
             backoff_factor=0.5,
-            status_forcelist=(429, 500, 502, 503, 504),
+            status_forcelist=(
+                408,  # request timeout
+                429,  # too many requests
+                *tuple(range(500, 600))),
         )
         adapter = HTTPAdapter(max_retries=retry)
         self.session.mount("https://", adapter)
-        self.session.mount("http://", adapter)
 
         self._symbols = ",".join(dict.fromkeys(("EUR", *TARGET_CURRENCIES)))
 
     def fetch_historical(self, rate_date: date) -> OxrSnapshot:
         """Return the USD-base rates and source timestamp for a single date."""
+
         url = f"{self.config.base_url}/historical/{rate_date.isoformat()}.json"
         try:
             resp = self.session.get(
@@ -55,12 +58,15 @@ class OxrClient:
             raise OxrError(f"OXR request failed for {rate_date}: {exc}") from exc
 
         body = resp.json(parse_float=Decimal)
+        
         rates = body.get("rates")
         if not isinstance(rates, dict) or not rates:
             raise OxrError(f"OXR response for {rate_date} missing 'rates': {body!r}")
+        
         epoch = body.get("timestamp")
         if not isinstance(epoch, (int, float)):
             raise OxrError(f"OXR response for {rate_date} missing 'timestamp': {body!r}")
+        
         timestamp = datetime.fromtimestamp(epoch, tz=timezone.utc)
         return OxrSnapshot(date=rate_date, rates=rates, timestamp=timestamp)
 
